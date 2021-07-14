@@ -32,7 +32,7 @@ All done? run:
 
 ```bash
 # development
-$ npm run start
+$ yarn dev
 ```
 
 ### Testing
