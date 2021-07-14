@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  pg_postgis:
+    image: postgis/postgis
+    environment:
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DB: 'api_postgis'
+    ports:
+      - '15432:5432'
+    volumes:
+      - api_postgis-data:/var/lib/postgresql/data
+
+  pg_postgis_test:
+    image: postgis/postgis
+    environment:
+      POSTGRES_PASSWORD: 'postgres_test'
+      POSTGRES_DB: 'api_postgis_test'
+    ports:
+      - '15433:5432'
+    volumes:
+      - api_postgis-test-data:/var/lib/postgresql/data
+
+volumes:
+  api_postgis-data:
+  api_postgis-test-data:

@@ -1,0 +1,198 @@
+openapi: '3.0.2'
+info:
+  title: api_postgis
+  version: '1.0'
+paths:
+  /partners/{partnerId}:
+    get:
+      summary: Returns a partner
+      tags:
+        - /partners
+      description: >-
+        Find a partner by id
+      parameters:
+        - in: path
+          name: partnerId
+          schema:
+            type: string
+          required: true
+          description: String id that corresponds to the partner
+      responses:
+        '200':
+          $ref: '#/components/responses/200_Partner'
+        '404':
+          $ref: '#/components/responses/404_Not_Found'
+        '500':
+          $ref: '#/components/responses/500_Internal'
+  /partners:
+    post:
+      summary: Create or Update a partner
+      tags:
+        - /partners
+      description: >-
+        Create a partner if body does not contain an id otherwise update all fields
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RequestBodyPartner'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_Partner'
+        '400':
+          $ref: '#/components/responses/400_Bad_Request'
+        '500':
+          $ref: '#/components/responses/500_Internal'
+
+    get:
+      summary: Find the closest partner
+      tags:
+        - /partners
+      description: >-
+        Find the closest partner to a long/lat which the coverage area includes the location
+      parameters:
+        - in: query
+          name: long
+          schema:
+            type: number
+          required: true
+          description: Longitude corresponding to location
+        - in: query
+          name: lat
+          schema:
+            type: number
+          required: true
+          description: Latitude corresponding to location
+      responses:
+        '200':
+          description: Successful request.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/ResponsePartner'
+                  - type: object
+        '400':
+          $ref: '#/components/responses/400_Bad_Request'
+        '500':
+          $ref: '#/components/responses/500_Internal'
+
+components:
+  schemas:
+    ResponseError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+              - path
+              - message
+              - errorCode
+            properties:
+              path:
+                type: string
+              message:
+                type: string
+              errorCode:
+                type: string
+    Point:
+      type: array
+      maxItems: 2
+      minItems: 2
+      items:
+        type: number
+    Partner:
+      type: object
+      required:
+        - tradingName
+        - ownerName
+        - document
+        - coverageArea
+        - address
+      properties:
+        tradingName:
+          type: string
+        ownerName:
+          type: string
+        document:
+          type: string
+        coverageArea:
+          type: object
+          required:
+            - type
+            - coordinates
+          properties:
+            type:
+              type: string
+              enum:
+                - MultiPolygon
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Point'
+        address:
+          type: object
+          required:
+            - type
+            - coordinates
+          properties:
+            type:
+              type: string
+              enum:
+                - Point
+            coordinates:
+              $ref: '#/components/schemas/Point'
+
+    ResponsePartner:
+      allOf:
+        - $ref: '#/components/schemas/Partner'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+
+    RequestBodyPartner:
+      allOf:
+        - $ref: '#/components/schemas/Partner'
+        - type: object
+          properties:
+            id:
+              type: string
+  responses:
+    200_Partner:
+      description: Successful request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponsePartner'
+    400_Bad_Request:
+      description: Unprocessable Entity.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseError'
+    404_Not_Found:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseError'
+    500_Internal:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseError'

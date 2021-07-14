@@ -1,0 +1,115 @@
+{
+  "env": {
+    "es6": true,
+    "node": true,
+    "jest": true
+  },
+  "extends": [
+    "airbnb-typescript/base",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "prettier",
+    "plugin:boundaries/recommended"
+  ],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 11,
+    "sourceType": "module",
+    "project": "tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint", "prettier", "boundaries"],
+  "rules": {
+    "@typescript-eslint/prefer-readonly": [
+      "error",
+      { "onlyInlineLambdas": true }
+    ],
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["warn"],
+    "class-methods-use-this": "off",
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "import/no-unresolved": "off",
+    "no-plusplus": "off",
+    "import/no-extraneous-dependencies": [
+      "error",
+      { "devDependencies": ["**/test/**"] }
+    ],
+    "boundaries/element-types": [
+      2,
+      {
+        "default": "disallow",
+        "rules": [
+          {
+            "from": "domain",
+            "allow": [["domain"], ["shared", { "category": "mocks" }]]
+          },
+          {
+            "from": "infrastructure",
+            "allow": [
+              ["infrastructure"],
+              ["domain"],
+              ["shared", { "category": "mocks" }],
+              ["shared", { "elementName": "environments" }]
+            ]
+          },
+          {
+            "from": "application",
+            "allow": [
+              ["application"],
+              ["domain"],
+              ["infrastructure"],
+              ["shared"]
+            ]
+          },
+          {
+            "from": "shared",
+            "allow": ["shared", "application", "domain", "infrastructure"]
+          }
+        ]
+      }
+    ]
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    },
+    "boundaries/elements": [
+      {
+        "type": "shared",
+        "mode": "file",
+        "pattern": "src/shared/**/*.ts",
+        "capture": ["category", "elementName"]
+      },
+      {
+        "type": "infrastructure",
+        "mode": "file",
+        "pattern": "src/infrastructure/**/*.ts"
+      },
+      {
+        "type": "domain",
+        "mode": "file",
+        "pattern": "src/domain/**/*.ts"
+      },
+      {
+        "type": "application",
+        "mode": "file",
+        "pattern": "src/application/**/*.ts"
+      }
+    ]
+  }
+}
